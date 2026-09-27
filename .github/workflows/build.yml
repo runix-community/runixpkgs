@@ -1,0 +1,47 @@
+name: Build packages
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  packages:
+    name: ${{ matrix.package }} (x86_64-linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        package: [zwwm, shojiwm, driftwm]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@b85815f71a6de0ddee80b8a80a98d43f4bcc66c7 # v31
+      - name: Configure read-only Cachix
+        if: github.event_name == 'pull_request' || github.ref != format('refs/heads/{0}', github.event.repository.default_branch) || env.CACHIX_AUTH_TOKEN == ''
+        uses: cachix/cachix-action@97e5ff84d02b3b4f9936339f767e17f03c9252ed # v16
+        with:
+          name: runix-community
+          skipPush: true
+      - name: Configure publishing Cachix
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && env.CACHIX_AUTH_TOKEN != ''
+        uses: cachix/cachix-action@97e5ff84d02b3b4f9936339f767e17f03c9252ed # v16
+        with:
+          name: runix-community
+          authToken: ${{ env.CACHIX_AUTH_TOKEN }}
+      - name: Build ${{ matrix.package }}
+        env:
+          PACKAGE: ${{ matrix.package }}
+        run: nix build --no-link --print-build-logs ".#${PACKAGE}"
