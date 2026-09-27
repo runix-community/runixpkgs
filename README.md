@@ -18,19 +18,13 @@ nix build .#shojiwm
 nix build .#driftwm
 ```
 
-Use the overlay and pass its packages to Runix system configuration:
+Runix includes this overlay by default. Select packages from its system package
+set in your host configuration:
 
 ```nix
-# In your host flake outputs = { runix, runixpkgs, nixpkgs, ... }:
-let
-  system = "x86_64-linux";
-  pkgs = import nixpkgs {
-    inherit system;
-    overlays = [ runixpkgs.overlays.default ];
-  };
-in
+# In your host flake outputs = { runix, ... }:
 runix.lib.runixSystem {
-  inherit system pkgs;
+  system = "x86_64-linux";
   modules = [
     ({ pkgs, ... }: {
       runix.packages = [
@@ -42,6 +36,9 @@ runix.lib.runixSystem {
   ];
 }
 ```
+
+For a standalone nixpkgs instance, use `runixpkgs.overlays.default` (also
+re-exported by Runix as `runix.overlays.default`).
 
 Override an individual build without changing the others:
 
