@@ -61,17 +61,17 @@
     "zwwm": {
       "flake": false,
       "locked": {
-        "lastModified": 1790505034,
-        "narHash": "sha256-OviZ6j31SwmGrJLU2DRgKahUZ858jZSzJFou6Pv72LA=",
+        "lastModified": 1790540194,
+        "narHash": "sha256-l0ZSfqAoH8RVjBi5rUpU58c9Teh3D2pK0YRfZTFVEtU=",
         "owner": "binarylinuxx",
         "repo": "zwwm",
-        "rev": "39c11384498a207899efdf45a7848becc59ea861",
+        "rev": "3f50507155fabe7701c651eec31db499d694cdff",
         "type": "github"
       },
       "original": {
         "owner": "binarylinuxx",
         "repo": "zwwm",
-        "rev": "39c11384498a207899efdf45a7848becc59ea861",
+        "rev": "3f50507155fabe7701c651eec31db499d694cdff",
         "type": "github"
       }
     }
