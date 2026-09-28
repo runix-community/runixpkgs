@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     zwwm = {
-      url = "github:binarylinuxx/zwwm/3f50507155fabe7701c651eec31db499d694cdff";
+      url = "github:binarylinuxx/zwwm/9dc49d2b726e3bcb37620d1e3b97ed44dd871599";
       flake = false;
     };
     shojiwm = {

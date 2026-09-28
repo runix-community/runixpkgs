@@ -1,0 +1,39 @@
+diff --git a/zwwm/include/zwwm/runtime_backend.hpp b/zwwm/include/zwwm/runtime_backend.hpp
+--- a/zwwm/include/zwwm/runtime_backend.hpp
++++ b/zwwm/include/zwwm/runtime_backend.hpp
+@@ -88,6 +88,7 @@ class RuntimeBackend {
+   zwayland::server::EventLoop* event_loop_ = nullptr;
+   libseat* seat_ = nullptr;
+   udev* udev_ = nullptr;
++  udev* libinput_udev_ = nullptr;
+   udev_monitor* udev_monitor_ = nullptr;
+   libinput* libinput_ = nullptr;
+   int seat_source_ = -1;
+diff --git a/zwwm/src/runtime_backend.cpp b/zwwm/src/runtime_backend.cpp
+--- a/zwwm/src/runtime_backend.cpp
++++ b/zwwm/src/runtime_backend.cpp
+@@ -343,6 +343,12 @@ bool RuntimeBackend::start() {
+   const char* seat_name = libseat_seat_name(seat_);
+   if (seat_name == nullptr || *seat_name == '\0') seat_name = "seat0";
+-  libinput_ = libinput_udev_create_context(&kLibinputInterface, this, udev_);
++  libinput_udev_ = udev_new();
++  if (libinput_udev_ == nullptr) {
++    last_error_ = "could not create an independent udev context for libinput";
++    stop();
++    return false;
++  }
++  libinput_ = libinput_udev_create_context(&kLibinputInterface, this, libinput_udev_);
+   if (libinput_ == nullptr || libinput_udev_assign_seat(libinput_, seat_name) != 0) {
+     last_error_ = std::string("could not initialize libinput for ") + seat_name;
+     stop();
+@@ -389,6 +395,10 @@ void RuntimeBackend::stop() {
+     libinput_unref(libinput_);
+     libinput_ = nullptr;
+   }
++  if (libinput_udev_ != nullptr) {
++    udev_unref(libinput_udev_);
++    libinput_udev_ = nullptr;
++  }
+   if (udev_source_ >= 0) {
+     event_loop_->remove(udev_source_);
+     udev_source_ = -1;
