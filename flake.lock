@@ -63,13 +63,13 @@
       "locked": {
         "lastModified": 1790616671,
         "narHash": "sha256-b+9m7wxbzmvMaoKZ2c0IPd52SFrQjvmC5cxmgc4GMgw=",
-        "owner": "binarylinuxx",
+        "owner": "zwwmWM",
         "repo": "zwwm",
         "rev": "9dc49d2b726e3bcb37620d1e3b97ed44dd871599",
         "type": "github"
       },
       "original": {
-        "owner": "binarylinuxx",
+        "owner": "zwwmWM",
         "repo": "zwwm",
         "rev": "9dc49d2b726e3bcb37620d1e3b97ed44dd871599",
         "type": "github"

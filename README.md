@@ -6,7 +6,7 @@ same nixpkgs input; upstream flake package outputs are not used.
 
 | Package | Upstream | Build options |
 | --- | --- | --- |
-| `zwwm` | [binarylinuxx/zwwm](https://github.com/binarylinuxx/zwwm) | `xwaylandSupport ? true` (CMake `XWAYLAND_ENABLE`) |
+| `zwwm` | [zwwmWM/zwwm](https://github.com/zwwmWM/zwwm) | `xwaylandSupport ? true` (CMake `XWAYLAND_ENABLE`) |
 | `shojiwm` | [bea4dev/ShojiWM](https://github.com/bea4dev/ShojiWM) | `heapDebug ? false` (Cargo `shoji_wm/heap-debug`), `xwaylandSupport ? true` (runtime Xwayland), `satelliteSupport ? true` (runtime xwayland-satellite) |
 | `driftwm` | [malbiruk/driftwm](https://github.com/malbiruk/driftwm) | `tracySupport ? false`, `tracyOnDemand ? false`, `tracyAllocations ? false` (Cargo features) |
 
