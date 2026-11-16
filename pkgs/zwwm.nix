@@ -1,32 +1,12 @@
+# zwwm from its own nix/package.nix, so upstream build changes come along
+# with the source, adjusted for Runix: no systemd, so udev is libudev-zero.
 {
-  lib,
+  callPackage,
   clangStdenv,
-  src,
-  cmake,
-  ninja,
-  pkg-config,
-  makeWrapper,
-  qt6,
-  dbus,
-  libepoxy,
-  fontconfig,
-  freetype,
-  libglvnd,
-  libdrm,
-  libgbm,
   libinput,
   libudev-zero,
-  libpng,
-  libxml2,
-  libxkbcommon,
-  libXcursor,
-  libxcb,
-  pipewire,
-  seatd,
-  xdg-desktop-portal,
-  xdg-desktop-portal-gtk,
-  xwayland,
-  xwaylandSupport ? true,
+  qt6,
+  src,
 }:
 let
   udev = libudev-zero;
@@ -34,44 +14,21 @@ let
     inherit udev;
     wacomSupport = false;
   };
-in
-clangStdenv.mkDerivation {
-  pname = "zwwm";
-  version = lib.strings.trim (builtins.readFile "${src}/.version");
-  inherit src;
-
-  nativeBuildInputs = [ cmake ninja pkg-config makeWrapper qt6.wrapQtAppsHook ];
-  patches = [ ./zwwm-libudev-zero.patch ];
-  buildInputs = [
-    dbus libepoxy fontconfig freetype libglvnd libdrm libgbm libinputWithoutSystemd udev
-    libpng libxml2 libxkbcommon libXcursor pipewire qt6.qtbase qt6.qtwayland
-    seatd xdg-desktop-portal
-  ] ++ lib.optional xwaylandSupport libxcb;
-
-  cmakeFlags = [
-    (lib.cmakeBool "XWAYLAND_ENABLE" xwaylandSupport)
-    (lib.cmakeOptionType "filepath" "CMAKE_INSTALL_SYSCONFDIR" "${placeholder "out"}/etc")
-  ];
-  dontWrapQtApps = true;
-
-  postFixup = ''
-    wrapQtApp "$out/bin/xdg-desktop-portal-zwwm"
-    wrapProgram "$out/bin/zwwm-session" \
-      --prefix PATH : "$out/bin:${lib.makeBinPath ([ dbus xdg-desktop-portal xdg-desktop-portal-gtk ] ++ lib.optional xwaylandSupport xwayland)}" \
-      --prefix XDG_DATA_DIRS : "$out/share" \
-      --prefix NIX_XDG_DESKTOP_PORTAL_DIR : "$out/share/xdg-desktop-portal/portals"
-    substituteInPlace "$out/share/wayland-sessions/zwwm.desktop" \
-      --replace-fail 'Exec=zwwm-session' "Exec=$out/bin/zwwm-session"
-    substituteInPlace "$out/share/dbus-1/services/org.freedesktop.impl.portal.desktop.zwwm.service" \
-      --replace-fail 'Exec=xdg-desktop-portal-zwwm' "Exec=$out/bin/xdg-desktop-portal-zwwm"
-  '';
-
-  passthru = { inherit xwaylandSupport; providedSessions = [ "zwwm" ]; };
-  meta = {
-    description = "C++23 post-Wayland compositor";
-    homepage = "https://github.com/zwwmWM/zwwm";
-    license = lib.licenses.bsd3;
-    platforms = lib.platforms.linux;
-    mainProgram = "zwwm-session";
+  upstream = callPackage "${src}/nix/package.nix" {
+    self = src;
+    stdenv = clangStdenv;
+    wrapQtAppsHook = qt6.wrapQtAppsHook;
+    libinput = libinputWithoutSystemd;
   };
-}
+in
+upstream.overrideAttrs (old: {
+  buildInputs = old.buildInputs ++ [ udev ];
+  # libudev-zero needs libinput to have its own udev context: shared with
+  # zwwm's DRM monitor, input devices are never seen. --replace-fail stops
+  # the build if upstream rewrites this line, rather than losing input.
+  postPatch = (old.postPatch or "") + ''
+    substituteInPlace zwwm/src/runtime_backend.cpp --replace-fail \
+      'libinput_udev_create_context(&kLibinputInterface, this, udev_)' \
+      'libinput_udev_create_context(&kLibinputInterface, this, udev_new())'
+  '';
+})

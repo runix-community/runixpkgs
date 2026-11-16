@@ -4,7 +4,8 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     zwwm = {
-      url = "github:zwwmWM/zwwm/9dc49d2b726e3bcb37620d1e3b97ed44dd871599";
+      # Rolling: the branch head, moved forward with `nix flake update zwwm`.
+      url = "github:zwwmWM/zwwm";
       flake = false;
     };
     shojiwm = {
