@@ -38,6 +38,7 @@
         "driftwm": "driftwm",
         "nixpkgs": "nixpkgs",
         "shojiwm": "shojiwm",
+        "vw": "vw",
         "zwwm": "zwwm"
       }
     },
@@ -55,6 +56,22 @@
         "owner": "bea4dev",
         "repo": "ShojiWM",
         "rev": "3fef0c862caab18332947f5e4ede83ff446312a7",
+        "type": "github"
+      }
+    },
+    "vw": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794853123,
+        "narHash": "sha256-quEX96N2vbS4SPAlpN7jiLZcp7pLADwsu/f1Wyvpbzc=",
+        "owner": "binarylinuxx",
+        "repo": "vw",
+        "rev": "0959b992c934d4837f5c61b0d415a4ec61b64da8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "binarylinuxx",
+        "repo": "vw",
         "type": "github"
       }
     },

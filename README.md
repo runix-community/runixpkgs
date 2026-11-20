@@ -7,6 +7,7 @@ same nixpkgs input; upstream flake package outputs are not used.
 | Package | Upstream | Build options |
 | --- | --- | --- |
 | `zwwm` | [zwwmWM/zwwm](https://github.com/zwwmWM/zwwm) | `xwaylandSupport ? true` (CMake `XWAYLAND_ENABLE`) |
+| `vw` | [binarylinuxx/vw](https://github.com/binarylinuxx/vw) | `static ? false` (`vw-static`: libvw.a for one-binary shells), `withFacet ? false`, `withExamples ? !static`, `withLua ? !static` |
 | `shojiwm` | [bea4dev/ShojiWM](https://github.com/bea4dev/ShojiWM) | `heapDebug ? false` (Cargo `shoji_wm/heap-debug`), `xwaylandSupport ? true` (runtime Xwayland), `satelliteSupport ? true` (runtime xwayland-satellite) |
 | `driftwm` | [malbiruk/driftwm](https://github.com/malbiruk/driftwm) | `tracySupport ? false`, `tracyOnDemand ? false`, `tracyAllocations ? false` (Cargo features) |
 
@@ -14,6 +15,7 @@ For example:
 
 ```sh
 nix build .#zwwm
+nix build .#vw          # or .#vw-static, the library shells link
 nix build .#shojiwm
 nix build .#driftwm
 ```
@@ -51,7 +53,8 @@ pkgs.driftwm.override { tracySupport = true; tracyOnDemand = true; }
 ShojiWM's upstream source unconditionally enables Smithay's Xwayland build
 feature; `xwaylandSupport` only controls the installed runtime dependency.
 
-GitHub Actions builds each package independently on `x86_64-linux`. With a
+GitHub Actions builds each package independently on `x86_64-linux`, and
+`zwwm`, `vw` and `vw-static` also on `aarch64-linux` (native ARM runners). With a
 write token, commits to the repository's default branch publish the results to
 [`runix-community.cachix.org`](https://runix-community.cachix.org); pull
 requests use that cache read-only. Without the token, CI still builds and

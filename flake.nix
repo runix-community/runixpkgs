@@ -8,6 +8,11 @@
       url = "github:zwwmWM/zwwm";
       flake = false;
     };
+    vw = {
+      # Rolling, like zwwm: vw generates its Wayland code with zwwm's zwayland.
+      url = "github:binarylinuxx/vw";
+      flake = false;
+    };
     shojiwm = {
       url = "github:bea4dev/ShojiWM/3fef0c862caab18332947f5e4ede83ff446312a7";
       flake = false;
@@ -19,7 +24,7 @@
   };
 
   outputs =
-    { self, nixpkgs, zwwm, shojiwm, driftwm }:
+    { self, nixpkgs, zwwm, vw, shojiwm, driftwm }:
     let
       systems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
@@ -27,6 +32,8 @@
     {
       overlays.default = final: _: {
         zwwm = final.callPackage ./pkgs/zwwm.nix { src = zwwm; };
+        vw = final.callPackage ./pkgs/vw.nix { src = vw; zwwmSrc = zwwm; };
+        vw-static = final.vw.override { static = true; };
         shojiwm = final.callPackage ./pkgs/shojiwm.nix { src = shojiwm; };
         driftwm = final.callPackage ./pkgs/driftwm.nix { src = driftwm; };
       };
@@ -39,7 +46,7 @@
           };
         in
         {
-          inherit (pkgs) zwwm shojiwm driftwm;
+          inherit (pkgs) zwwm vw vw-static shojiwm driftwm;
           default = pkgs.zwwm;
         });
     };
