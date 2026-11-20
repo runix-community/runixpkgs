@@ -53,8 +53,8 @@ pkgs.driftwm.override { tracySupport = true; tracyOnDemand = true; }
 ShojiWM's upstream source unconditionally enables Smithay's Xwayland build
 feature; `xwaylandSupport` only controls the installed runtime dependency.
 
-GitHub Actions builds each package independently on `x86_64-linux`, and
-`zwwm`, `vw` and `vw-static` also on `aarch64-linux` (native ARM runners). With a
+GitHub Actions builds every package independently on `x86_64-linux` and
+`aarch64-linux` (native ARM runners). With a
 write token, commits to the repository's default branch publish the results to
 [`runix-community.cachix.org`](https://runix-community.cachix.org); pull
 requests use that cache read-only. Without the token, CI still builds and

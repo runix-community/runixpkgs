@@ -14,24 +14,21 @@ concurrency:
 
 jobs:
   packages:
-    name: ${{ matrix.package }} (${{ matrix.system }})
-    runs-on: ${{ matrix.runner }}
+    name: ${{ matrix.package }} (${{ matrix.platform.system }})
+    runs-on: ${{ matrix.platform.runner }}
     timeout-minutes: 360
     env:
       CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 6
       matrix:
-        package: [zwwm, vw, shojiwm, driftwm]
-        system: [x86_64-linux]
-        runner: [ubuntu-latest]
-        include:
-          # Native ARM runners (free for public repositories), for phones and
-          # other aarch64 machines.
-          - { package: zwwm, system: aarch64-linux, runner: ubuntu-24.04-arm }
-          - { package: vw, system: aarch64-linux, runner: ubuntu-24.04-arm }
-          - { package: vw-static, system: aarch64-linux, runner: ubuntu-24.04-arm }
+        package: [zwwm, vw, vw-static, shojiwm, driftwm]
+        # Native runners for each architecture (ARM ones are free for public
+        # repositories), so aarch64 machines get the same binary cache.
+        platform:
+          - { system: x86_64-linux, runner: ubuntu-latest }
+          - { system: aarch64-linux, runner: ubuntu-24.04-arm }
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -52,5 +49,5 @@ jobs:
       - name: Build ${{ matrix.package }}
         env:
           PACKAGE: ${{ matrix.package }}
-          SYSTEM: ${{ matrix.system }}
+          SYSTEM: ${{ matrix.platform.system }}
         run: nix build --no-link --print-build-logs ".#packages.${SYSTEM}.${PACKAGE}"
